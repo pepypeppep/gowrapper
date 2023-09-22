@@ -6,6 +6,10 @@ curl https://raw.githubusercontent.com/pepypeppep/gowrapper/main/model.zsn -nc -
 curl https://raw.githubusercontent.com/pepypeppep/gowrapper/main/repository.zsn -nc - --output modules/$1/repository/$1.go
 curl https://raw.githubusercontent.com/pepypeppep/gowrapper/main/controller.zsn -nc - --output modules/$1/controller/$1.go
 curl https://raw.githubusercontent.com/pepypeppep/gowrapper/main/routes.zsn -nc - --output modules/$1/routes.go
+VARPROJ=$(basename "`pwd`")
+sed -i '' "s/PROJECT/$VARPROJ/g" modules/$1/repository/$1.go
+sed -i '' "s/PROJECT/$VARPROJ/g" modules/$1/controller/$1.go
+sed -i '' "s/PROJECT/$VARPROJ/g" modules/$1/routes.go
 sed -i '' "s/LOWERMODULE/$1/g" modules/$1/model/$1.go
 sed -i '' "s/LOWERMODULE/$1/g" modules/$1/repository/$1.go
 sed -i '' "s/LOWERMODULE/$1/g" modules/$1/controller/$1.go

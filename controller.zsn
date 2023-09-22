@@ -1,23 +1,25 @@
 package controller
 
 import (
+	"PROJECT/modules/LOWERMODULE/repository"
+
 	"github.com/gofiber/fiber/v2"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-type UniversitasController struct {
+type UPPERMODULEController struct {
 	repo *repository.CollectionRepository
 }
 
-func Init(db *mongo.Database) *UniversitasController {
-	LOWERMODULE := &UniversitasController{
+func Init(db *mongo.Database) *UPPERMODULEController {
+	LOWERMODULE := &UPPERMODULEController{
 		repo: repository.Init(db),
 	}
 
 	return LOWERMODULE
 }
 
-func (h *UniversitasController) List(c *fiber.Ctx) error {
+func (h *UPPERMODULEController) List(c *fiber.Ctx) error {
 	LOWERMODULEData, err := h.repo.FindAll()
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{
