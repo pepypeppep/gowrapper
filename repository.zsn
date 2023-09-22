@@ -70,7 +70,6 @@ func (r *CollectionRepository) Update(_id primitive.ObjectID, updateData *model.
 	LOWERMODULE := bson.M{
 		"$set": bson.M{
 			"name":        updateData.Name,
-			"description": updateData.Description,
 		},
 	}
 	_, err := r.coll.UpdateOne(context.TODO(), bson.M{"_id": _id}, LOWERMODULE)
