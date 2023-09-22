@@ -1,0 +1,94 @@
+package repository
+
+import (
+	"context"
+
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo"
+)
+
+type UPPERMODULERepository interface {
+	FindAll() (*[]model.UPPERMODULE, error)
+	FindByID(_id primitive.ObjectID) (*model.UPPERMODULE, error)
+	Insert(LOWERMODULEData *model.UPPERMODULE) (*model.UPPERMODULE, error)
+	Update(_id primitive.ObjectID, updateData *model.UPPERMODULE) (*model.UPPERMODULE, error)
+	Delete(_id primitive.ObjectID) (*model.UPPERMODULE, error)
+}
+
+type CollectionRepository struct {
+	coll *mongo.Collection
+}
+
+func Init(db *mongo.Database) *CollectionRepository {
+	return &CollectionRepository{
+		coll: db.Collection(model.UPPERMODULECollection),
+	}
+}
+
+func (r *CollectionRepository) FindAll() (*[]model.UPPERMODULE, error) {
+	var LOWERMODULE []model.UPPERMODULE
+	cur, err := r.coll.Find(context.TODO(), bson.D{{}})
+	if err != nil {
+		return nil, err
+	}
+	if err := cur.All(context.TODO(), &LOWERMODULE); err != nil {
+		return nil, err
+	}
+	if LOWERMODULE == nil {
+		LOWERMODULE = []model.UPPERMODULE{}
+	}
+	return &LOWERMODULE, nil
+}
+
+func (r *CollectionRepository) FindByID(_id primitive.ObjectID) (*model.UPPERMODULE, error) {
+	var LOWERMODULE *model.UPPERMODULE
+	filter := bson.M{"_id": _id}
+	err := r.coll.FindOne(context.TODO(), filter).Decode(&LOWERMODULE)
+	if err != nil {
+		return nil, err
+	}
+	return LOWERMODULE, nil
+}
+
+func (r *CollectionRepository) Insert(LOWERMODULEData *model.UPPERMODULE) (*model.UPPERMODULE, error) {
+	var data *model.UPPERMODULE
+	dataInsert, err := r.coll.InsertOne(context.TODO(), LOWERMODULEData)
+	if err != nil {
+		return nil, err
+	}
+	insertedID := dataInsert.InsertedID.(primitive.ObjectID)
+	err = r.coll.FindOne(context.TODO(), bson.M{"_id": insertedID}).Decode(&data)
+	if err != nil {
+		return nil, err
+	}
+	return data, nil
+}
+
+func (r *CollectionRepository) Update(_id primitive.ObjectID, updateData *model.UPPERMODULE) (*model.UPPERMODULE, error) {
+	LOWERMODULE := bson.M{
+		"$set": bson.M{
+			"name":        updateData.Name,
+			"description": updateData.Description,
+		},
+	}
+	_, err := r.coll.UpdateOne(context.TODO(), bson.M{"_id": _id}, LOWERMODULE)
+	if err != nil {
+		return nil, err
+	}
+	var updated model.UPPERMODULE
+	err = r.coll.FindOne(context.TODO(), bson.M{"_id": _id}).Decode(&updated)
+	if err != nil {
+		return nil, err
+	}
+	return &updated, nil
+}
+
+func (r *CollectionRepository) Delete(_id primitive.ObjectID) (*model.UPPERMODULE, error) {
+	var LOWERMODULE model.UPPERMODULE
+	err := r.coll.FindOneAndDelete(context.TODO(), bson.M{"_id": _id}).Decode(&LOWERMODULE)
+	if err != nil {
+		return nil, err
+	}
+	return &LOWERMODULE, nil
+}
